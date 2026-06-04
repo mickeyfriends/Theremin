@@ -1,0 +1,310 @@
+html {
+  font-size: 10px;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  width: 100%;
+  height: inherit;
+  background-image: url("theremin.jpg"); 
+  background-size: cover;
+  background-position: center;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 20px;              /* ← 間隔を40px→20pxに縮めた */
+  padding-top: 20px;      /* ← 上の余白も少し減らした */
+}
+
+/* === Piano === */
+.piano {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  user-select: none;
+  position: relative;
+}
+
+.key {
+  border: 1px solid #000;
+  box-sizing: border-box;
+  transition: all 0.15s ease;
+}
+
+.key.white {
+  position: relative;
+  width: 60px;
+  height: 200px;
+  background: #fff;
+  z-index: 1;
+}
+
+.key.black {
+  position: absolute;
+  width: 40px;
+  height: 120px;
+  background: #000;
+  z-index: 2;
+  top: 0;
+  border-radius: 0 0 3px 3px;
+}
+
+/* 黒鍵の位置 */
+.key.black[data-note="ド#"] { left: 45px; }
+.key.black[data-note="レ#"] { left: 105px; }
+.key.black[data-note="ファ#"] { left: 225px; }
+.key.black[data-note="ソ#"] { left: 285px; }
+.key.black[data-note="ラ#"] { left: 345px; }
+
+/* ハイライト */
+.key.active.white {
+  background: gold;
+  box-shadow: 0 0 20px gold;
+}
+.key.active.black {
+  background: #ffcc00;
+  box-shadow: 0 0 20px gold;
+}
+
+/* === Tuner === */
+#tuner {
+  position: relative;
+  width: 240px;
+  height: 40px;
+  background: rgba(0, 0, 0, 0.05); /* 白背景に合う薄いグレー */
+  backdrop-filter: blur(6px);
+  border-radius: 10px;
+  padding: 8px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1); /* 明るい影 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(0,0,0,0.15);
+}
+
+#tuner-scale {
+  position: relative;
+  width: 200px;
+  height: 4px;
+  background: #aaa; /* グレーのスケールライン */
+  border-radius: 2px;
+}
+
+#tuner-pointer {
+  position: absolute;
+  top: -6px;
+  width: 2px;
+  height: 16px;
+  background: #e60033; /* 少し深い赤に変更 */
+  left: 50%;
+  transition: left 0.1s ease-out;
+}
+
+#tuner-text {
+  text-align: center;
+  font-size: 13px;
+  margin-top: 4px;
+  color: #222; /* 白背景でも見やすい黒 */
+  font-family: sans-serif;
+}
+
+/* === 下部表示 === */
+.app-contents {
+  display: flex;
+  align-items: baseline;
+  gap: 20px;
+  font-size: 28px;
+  padding: 6px 16px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.05); /* 半透明グレー */
+  color: #222; /* 黒に変更 */
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+#outputText {
+  font-weight: bold;
+  font-size: 34px;
+  display: inline-block;
+  width: 3em;
+  text-align: center;
+  color: #111; /* より濃い黒 */
+}
+
+#freq-value {
+  font-weight: bold;
+  color: #444; /* 少しグレーでバランス */
+}
+
+/* === 追加箇所_メーターの位置やデザインの定義 === */
+/* === Volume Meter === */
+#volume-meter-wrapper {
+  position: absolute; /* 画面に対して絶対位置で指定 画面の左下にメーターを固定*/
+  bottom: 5%;         /* 画面下から5%の位置 */
+  left: 5%;           /* 画面左から5%の位置 */
+  display: flex;      /* 子要素をフレックスボックスで配置 */
+  flex-direction: column; /* 縦方向に並べる */
+  align-items: center;    /* 中央揃え */
+  gap: 8px;           /* 各要素の間隔 */
+  z-index: 10;        /* 手の画像より手前に表示 */
+}
+
+/*2つのアイコンを重ねるためのコンテナ*/
+#volume-icon-container {
+  width: 30px;  /* アイコンのサイズ (幅) */
+  height: 30px; /* アイコンのサイズ (高さ) */
+  position: relative; /* 子要素のabsolute配置の基準 */
+}
+
+/* アイコン共通スタイル */
+.volume-icon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* 画像が背景に溶け込まないように少し影をつける */
+  filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.6));
+}
+
+/* ONアイコンは最初は隠しておく */
+#volume-icon-on {
+  display: none;
+}
+
+/* OFFアイコンは最初から表示 */
+#volume-icon-off {
+  display: block;
+}
+
+/* メーター本体 */
+#volume-meter {
+  width: 35px;        /* メーターの幅 (大きくしました) */
+  height: 200px;      /* メーターの高さ (大きくしました) */
+  background-color: rgba(0, 0, 0, 0.3);  /* 背景色（半透明の黒） */
+  border: 2px solid rgba(255, 255, 255, 0.5);  /* 枠線（半透明の白） */
+  border-radius: 8px; /* 角を少し丸く */
+  overflow: hidden;   /* はみ出した要素を隠す */
+  box-shadow: 0 0 10px rgba(0,0,0,0.3); /* 少し立体感を出す */
+}
+
+#volume-level {
+  width: 100%;
+  height: 100%;
+  /* メーターの色をグラデーションに */
+  background: linear-gradient(to top, #ff416c, #ffde00);
+  /* 変形の基点を下端に設定 */
+  transform-origin: bottom;
+  /*↑によりJavaScriptで高さを変更（transform: scaleY()）した際に、*/
+  /*メーターが下から上に向かって伸び縮みするようになります。*/
+
+  /* 高さが変わる時のアニメーション */
+  transition: transform 0.1s ease-out;
+  transform: scaleY(0); /* JSで制御する前の初期状態 */
+}
+
+#volume-value {
+  font-size: 18px; /* 数値のフォントサイズ */
+  font-weight: bold;
+  color: white;
+  font-family: sans-serif;
+  text-shadow: 0 0 5px rgba(0,0,0,0.5); /* 読みやすく影をつける */
+}
+
+#press-space-message {
+  position: fixed;
+  bottom: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 2rem;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 0 0 8px #ff0055, 0 0 15px #ff55aa;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 12px 24px;
+  border-radius: 12px;
+  border: 2px solid #ff77aa;
+  animation: pulse 2s infinite;
+  display: none; /* 初期は非表示 */
+  z-index: 1000;
+}
+
+/* =========================
+   iPad用 縦スライダー（左手・右手）
+========================= */
+
+.ipad-slider-container {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 9999;
+  display: none;
+}
+
+#ipad-slider-container {
+  left: 20px;
+}
+
+#ipad-right-slider-container {
+  right: 20px;
+}
+
+/* iPad / タッチ端末だけ表示 */
+@media (pointer: coarse) {
+
+  .ipad-slider-container {
+    display: block;
+  }
+}
+
+.ipad-slider {
+
+  appearance: slider-vertical;
+  -webkit-appearance: slider-vertical;
+
+  width: 40px;
+  height: 300px;
+
+  writing-mode: bt-lr;
+}
+
+@media (pointer: coarse) {
+
+  .key.white {
+    width: 45px;
+    height: 150px;
+  }
+
+  .key.black {
+    width: 30px;
+    height: 90px;
+  }
+
+  .key.black[data-note="ド#"] { left: 30px; }
+  .key.black[data-note="レ#"] { left: 75px; }
+  .key.black[data-note="ファ#"] { left: 165px; }
+  .key.black[data-note="ソ#"] { left: 210px; }
+  .key.black[data-note="ラ#"] { left: 255px; }
+
+  #tuner {
+    width: 180px;
+    height: 30px;
+  }
+
+  #tuner-scale {
+    width: 150px;
+  }
+
+  #tuner-text {
+    font-size: 11px;
+  }
+
+  body{
+    padding-top: 0px;  
+    gap:15px;
+  }
+}
