@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Theremin</title>
+
+  <link href="app.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+
+  <div class="piano">
+    <div class="key white" data-note="ド"></div>
+    <div class="key black" data-note="ド#"></div>
+    <div class="key white" data-note="レ"></div>
+    <div class="key black" data-note="レ#"></div>
+    <div class="key white" data-note="ミ"></div>
+    <div class="key white" data-note="ファ"></div>
+    <div class="key black" data-note="ファ#"></div>
+    <div class="key white" data-note="ソ"></div>
+    <div class="key black" data-note="ソ#"></div>
+    <div class="key white" data-note="ラ"></div>
+    <div class="key black" data-note="ラ#"></div>
+    <div class="key white" data-note="シ"></div>
+  </div>
+
+  <div id="tuner">
+    <div id="tuner-scale">
+      <div id="tuner-pointer"></div>
+    </div>
+    <div id="tuner-text"></div>
+  </div>
+
+  <div id="volume-meter-wrapper">
+
+    <div id="volume-icon-container">
+      <img src="speaker-on.png" alt="Volume On" id="volume-icon-on" class="volume-icon">
+      <img src="speaker-off.png" alt="Volume Off" id="volume-icon-off" class="volume-icon">
+    </div>
+
+    <div id="volume-meter">
+      <div id="volume-level"></div>
+    </div>
+
+    <span id="volume-value">0</span>
+
+  </div>
+
+  <div class="app-contents">
+    <span class="label">Scale</span>
+    <span id="outputText"></span>
+    <span id="freq-value"></span>
+    <span class="unit">Hz</span>
+  </div>
+
+  <div id="press-space-message">
+    画面をタッチして音を出してね！
+  </div>
+
+  <!-- ========================= -->
+  <!-- iPad用 縦スライダー（左手・右手） -->
+  <!-- ========================= -->
+
+  <div id="ipad-slider-container" class="ipad-slider-container">
+
+    <input
+      type="range"
+      id="ipad-slider"
+      class="ipad-slider"
+      min="0"
+      max="100"
+      value="50"
+      orient="vertical"
+    >
+
+  </div>
+
+  <div id="ipad-right-slider-container" class="ipad-slider-container">
+
+    <input
+      type="range"
+      id="ipad-right-slider"
+      class="ipad-slider"
+      min="0"
+      max="100"
+      value="50"
+      orient="vertical"
+    >
+
+  </div>
+
+  <!-- ========================= -->
+
+  <script type="module" src="rightHand.js"></script>
+  <script type="module" src="leftHand.js"></script>
+  <script type="module" src="app.js"></script>
+
+</body>
+</html>
